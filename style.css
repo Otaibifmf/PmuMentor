@@ -70,6 +70,65 @@ main {
     background-color: #1a365d;
 }
 
+.card {
+    background-color: white;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    width: 100%;
+    margin: 20px 0;
+    transition: transform 0.2s;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+}
+
+.card h2 {
+    text-align: center;
+    color: #1b2a49; 
+    margin-bottom: 20px;
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+    align-items: center; 
+}
+
+input {
+    padding: 12px;
+    margin: 10px 0;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    font-size: 1em;
+    width: 100%; 
+    box-sizing: border-box;
+}
+
+button {
+    padding: 12px;
+    background-color: #1b2a49; 
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 1em;
+    cursor: pointer;
+    width: 100%; 
+    margin-top: 10px;
+    transition: background-color 0.2s;
+}
+
+button:hover {
+    background-color: #16223b;
+}
+
+#message {
+    text-align: center;
+    font-weight: bold;
+    color: #e74c3c;
+    padding: 10px;
+}
 
 footer {
     text-align: center;
