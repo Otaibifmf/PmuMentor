@@ -44,6 +44,33 @@ main {
     align-items: center;
 }
 
+.tabs {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
+}
+
+.tab-btn {
+    background-color: #3a4f7a; 
+    border: none;
+    padding: 10px 20px;
+    margin: 0 5px;
+    cursor: pointer;
+    font-size: 1em;
+    border-radius: 5px 5px 0 0;
+    transition: background-color 0.2s;
+    color: white;
+}
+
+.tab-btn.active {
+    background-color: #16223b;
+}
+
+.tab-btn:hover {
+    background-color: #1a365d;
+}
+
+
 footer {
     text-align: center;
     padding: 20px;
