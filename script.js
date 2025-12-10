@@ -1,68 +1,168 @@
-let users = [];
-
-function showMessage(msg) {
-    document.getElementById('message').innerText = msg;
+// ===========================
+// User Model (Data Class)
+// ===========================
+class User {
+    constructor(name, email, password) {
+        this.name = name;
+        this.email = email;
+        this.password = password;
+    }
 }
 
-function showForm(formName) {
-    document.getElementById('registerForm').style.display = 'none';
-    document.getElementById('loginForm').style.display = 'none';
-    document.getElementById('updateForm').style.display = 'none';
+// ===========================
+// Storage Manager
+// ===========================
+class UserStorage {
 
-    document.getElementById(formName + 'Form').style.display = 'block';
+    static saveUser(user) {
+        localStorage.setItem("user", JSON.stringify(user));
+    }
 
-    const tabs = document.querySelectorAll('.tab-btn');
-    tabs.forEach(tab => tab.classList.remove('active'));
-    if(formName === 'register') tabs[0].classList.add('active');
-    if(formName === 'login') tabs[1].classList.add('active');
-    if(formName === 'update') tabs[2].classList.add('active');
-
-    showMessage('');
+    static loadUser() {
+        const data = localStorage.getItem("user");
+        return data ? JSON.parse(data) : null;
+    }
 }
 
-document.getElementById('registerForm').addEventListener('submit', function(e) {
-    e.preventDefault();
-    const name = document.getElementById('regName').value;
-    const email = document.getElementById('regEmail').value;
-    const password = document.getElementById('regPassword').value;
+// ===========================
+// User Interface Controller
+// ===========================
+class UserUIController {
 
-    if(users.find(u => u.email === email)) {
-        showMessage('Email already exists!');
-        return;
+    constructor() {
+        this.registerForm = document.getElementById("registerForm");
+        this.loginForm = document.getElementById("loginForm");
+        this.updateForm = document.getElementById("updateForm");
+        this.messageBox = document.getElementById("message");
+        this.tabButtons = document.querySelectorAll(".tab-btn");
+
+        this.initializeEventListeners();
+        this.showForm("register");
     }
 
-    users.push({ name, email, password });
-    showMessage('Registration successful!');
-    this.reset();
-});
+    // ---------------------------
+    // Form & Tab Display Handling
+    // ---------------------------
+    showForm(formName) {
+        this.hideAllForms();
+        this.clearActiveTabs();
 
-document.getElementById('loginForm').addEventListener('submit', function(e) {
-    e.preventDefault();
-    const email = document.getElementById('loginEmail').value;
-    const password = document.getElementById('loginPassword').value;
+        switch (formName) {
+            case "register":
+                this.registerForm.style.display = "block";
+                this.tabButtons[0].classList.add("active");
+                break;
 
-    const user = users.find(u => u.email === email && u.password === password);
-    if(!user) {
-        showMessage('Invalid email or password!');
-        return;
+            case "login":
+                this.loginForm.style.display = "block";
+                this.tabButtons[1].classList.add("active");
+                break;
+
+            case "update":
+                this.updateForm.style.display = "block";
+                this.tabButtons[2].classList.add("active");
+                break;
+        }
     }
 
-    showMessage(`Login successful! Welcome, ${user.name}`);
-    this.reset();
-});
-
-document.getElementById('updateForm').addEventListener('submit', function(e) {
-    e.preventDefault();
-    const email = document.getElementById('updateEmail').value;
-    const newName = document.getElementById('updateName').value;
-
-    const user = users.find(u => u.email === email);
-    if(!user) {
-        showMessage('User not found!');
-        return;
+    hideAllForms() {
+        this.registerForm.style.display = "none";
+        this.loginForm.style.display = "none";
+        this.updateForm.style.display = "none";
     }
 
-    user.name = newName;
-    showMessage('Profile updated successfully!');
-    this.reset();
+    clearActiveTabs() {
+        this.tabButtons.forEach(btn => btn.classList.remove("active"));
+    }
+
+    // ---------------------------
+    // Message Helper
+    // ---------------------------
+    showMessage(text, color = "green") {
+        this.messageBox.style.color = color;
+        this.messageBox.textContent = text;
+
+        setTimeout(() => {
+            this.messageBox.textContent = "";
+        }, 3000);
+    }
+
+    // ---------------------------
+    // Event Listener Initialization
+    // ---------------------------
+    initializeEventListeners() {
+        this.registerForm.addEventListener("submit", (e) => this.handleRegister(e));
+        this.loginForm.addEventListener("submit", (e) => this.handleLogin(e));
+        this.updateForm.addEventListener("submit", (e) => this.handleUpdate(e));
+    }
+
+    // ---------------------------
+    // REGISTER LOGIC
+    // ---------------------------
+    handleRegister(event) {
+        event.preventDefault();
+
+        const name = document.getElementById("regName").value;
+        const email = document.getElementById("regEmail").value;
+        const password = document.getElementById("regPassword").value;
+
+        const user = new User(name, email, password);
+        UserStorage.saveUser(user);
+
+        this.showMessage("Registration successful!", "green");
+    }
+
+    // ---------------------------
+    // LOGIN LOGIC
+    // ---------------------------
+    handleLogin(event) {
+        event.preventDefault();
+
+        const email = document.getElementById("loginEmail").value;
+        const password = document.getElementById("loginPassword").value;
+
+        const storedUser = UserStorage.loadUser();
+
+        if (!storedUser || storedUser.email !== email || storedUser.password !== password) {
+            this.showMessage("Invalid login credentials!", "red");
+            return;
+        }
+
+        window.location.href = "dashboard.html";
+    }
+
+    // ---------------------------
+    // UPDATE PROFILE LOGIC
+    // ---------------------------
+    handleUpdate(event) {
+        event.preventDefault();
+
+        const newEmail = document.getElementById("updateEmail").value;
+        const newName = document.getElementById("updateName").value;
+
+        const user = UserStorage.loadUser();
+
+        if (!user) {
+            this.showMessage("No user found!", "red");
+            return;
+        }
+
+        user.email = newEmail;
+        user.name = newName;
+
+        UserStorage.saveUser(user);
+
+        this.showMessage("Profile updated successfully!", "green");
+    }
+}
+
+// ===========================
+// Initialize After DOM Ready
+// ===========================
+document.addEventListener("DOMContentLoaded", () => {
+    const uiController = new UserUIController();
+
+    window.showForm = function (formName) {
+        uiController.showForm(formName);
+    };
 });
